@@ -134,7 +134,6 @@ class GrantsEmbeddingPipeline:
         print("🔧 Initializing UMAP...")
         reducer = umap.UMAP(
             n_components=2,
-            random_state=42,
             verbose=True  # Show UMAP progress
         )
 
