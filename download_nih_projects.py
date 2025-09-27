@@ -20,7 +20,7 @@ class NIHProjectsDownloader:
         self.api_url = "https://api.reporter.nih.gov/v2/projects/search"
         self.cache_dir = Path(cache_dir)
         self.batch_size = 500
-        self.rate_limit_delay = 1.0  # 1 second delay between requests
+        self.rate_limit_delay = 2.0  # 2 seconds delay between requests
 
         # US states and territories for org_states
         self.states = [
