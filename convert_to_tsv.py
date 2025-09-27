@@ -22,11 +22,13 @@ class NIHDataConverter:
         self.output_file = Path(output_file)
         self.seen_project_nums: Set[str] = set()
         self.seen_core_project_nums: Set[str] = set()
-        self.skipped_count = 0
+        self.skipped_project_nums = 0
+        self.skipped_core_project_nums = 0
 
         # TSV column headers
         self.headers = [
             "project_num",
+            "core_project_num",
             "fiscal_year",
             "org_name",
             "award_amount",
@@ -38,25 +40,11 @@ class NIHDataConverter:
             "spending_categories_desc",
             "date_added",
             "project_start_date",
-            "project_end_date"
+            "project_end_date",
+            "award_type",
+            "activity_code"
         ]
 
-    def extract_core_project_num(self, project_num: str) -> str:
-        """Extract core project number from full project number.
-
-        Example: "1R15DE032063-01A1" -> "R15DE032063"
-        """
-        if not project_num:
-            return ""
-
-        # Find the dash position
-        dash_pos = project_num.find('-')
-        if dash_pos == -1:
-            # No dash found, use the whole string but skip first character
-            return project_num[1:] if len(project_num) > 1 else project_num
-
-        # Extract from second character to character before dash
-        return project_num[1:dash_pos] if len(project_num) > 1 else ""
 
     def discover_json_files(self) -> List[Path]:
         """Discover all JSON files in the cache directory."""
@@ -116,19 +104,24 @@ class NIHDataConverter:
     def extract_project_data(self, project: Dict) -> Optional[Dict]:
         """Extract required fields from a project record."""
         try:
-            # Extract project number and check for duplicates
+            # Extract project number and core project number
             project_num = project.get('project_num', '')
-            core_project_num = self.extract_core_project_num(project_num)
+            core_project_num = project.get('core_project_num', '')
 
-            # Check for duplicates
-            if project_num in self.seen_project_nums or core_project_num in self.seen_core_project_nums:
-                self.skipped_count += 1
+            # Check for duplicate project_num
+            if project_num in self.seen_project_nums:
+                self.skipped_project_nums += 1
+                return None
+
+            # Check for duplicate core_project_num (use project_num if core is empty)
+            check_core = core_project_num if core_project_num else project_num
+            if check_core in self.seen_core_project_nums:
+                self.skipped_core_project_nums += 1
                 return None
 
             # Add to seen sets
             self.seen_project_nums.add(project_num)
-            if core_project_num:
-                self.seen_core_project_nums.add(core_project_num)
+            self.seen_core_project_nums.add(check_core)
 
             # Extract organization name
             org_name = ""
@@ -169,8 +162,13 @@ class NIHDataConverter:
             project_start_date = self.extract_date(project.get('project_start_date', ''))
             project_end_date = self.extract_date(project.get('project_end_date', ''))
 
+            # Extract award type and activity code
+            award_type = project.get('award_type', '')
+            activity_code = project.get('activity_code', '')
+
             return {
-                'project_num': core_project_num or project_num,
+                'project_num': project_num,
+                'core_project_num': core_project_num,
                 'fiscal_year': fiscal_year,
                 'org_name': org_name,
                 'award_amount': award_amount,
@@ -182,7 +180,9 @@ class NIHDataConverter:
                 'spending_categories_desc': spending_categories_desc,
                 'date_added': date_added,
                 'project_start_date': project_start_date,
-                'project_end_date': project_end_date
+                'project_end_date': project_end_date,
+                'award_type': award_type,
+                'activity_code': activity_code
             }
 
         except Exception as e:
@@ -248,7 +248,9 @@ class NIHDataConverter:
         print(f"📊 Statistics:")
         print(f"   - Total projects processed: {processed_count:,}")
         print(f"   - Projects written to TSV: {written_count:,}")
-        print(f"   - Duplicates skipped: {self.skipped_count:,}")
+        print(f"   - Duplicates skipped (project_num): {self.skipped_project_nums:,}")
+        print(f"   - Duplicates skipped (core_project_num): {self.skipped_core_project_nums:,}")
+        print(f"   - Total duplicates skipped: {self.skipped_project_nums + self.skipped_core_project_nums:,}")
         print(f"   - Output file: {self.output_file}")
         print(f"   - File size: {self.output_file.stat().st_size / (1024*1024):.1f} MB")
 

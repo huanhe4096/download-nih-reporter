@@ -195,7 +195,8 @@ The `results` is a list of grant data, and it has many attributes. For example:
 
 3. In this python script, I only need the following attributes
 
-- project_num: the grant number, but I only the core project number. for example, for "1R15DE032063-01A1", I only need the "R15DE032063", it's the second character to the character before a dash. Since there could be duplicated project number, please check whether a project number has been processed, if duplicated in whole or the core project number, you can skip it. Just count how many you have skipped.
+- project_num: the grant number. most of time this should be unique, but if it's duplicated in whole, skip the new one. count how many are skipped.
+- core_project_num: the core number of this grant. Use this core_project_num to distinguish projects, if a core_project_num exists, we can skip the new one. count how many are skipped.
 - fiscal_year: the fiscal_year number.
 - organization.org_name: organization is a json object, I only need the `org_name`.
 - award_amount: the amount of this award.
@@ -208,6 +209,8 @@ The `results` is a list of grant data, and it has many attributes. For example:
 - date_added: I only need the date in YYYY-MM-DD format, usually just the first 10 characters.
 - project_start_date: only need the date in YYYY-MM-DD format.
 - project_end_date: only need the date in YYYY-MM-DD format.
+- award_type: the type of this award.
+- activity_code: the activity code, e.g., R01, R15, K99, etc.
 
 1. Due to the large size, show a progress bar.
 2. Save the output .tsv file to `./nih-reporter-grants.tsv` by default if user does not provide path to output
