@@ -46,8 +46,10 @@ class GrantsEmbeddingPipeline:
         activity_code = str(row.get('activity_code', ''))
         project_title = str(row.get('project_title', ''))
         abstract_text = str(row.get('abstract_text', ''))
+        spending_categories_desc = str(row.get('spending_categories_desc', ''))
 
-        return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
+        # return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
+        return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {spending_categories_desc} | {project_title}"
 
     def generate_embeddings(self):
         """Generate text embeddings for all grants."""
