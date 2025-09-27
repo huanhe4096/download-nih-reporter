@@ -218,3 +218,28 @@ The `results` is a list of grant data, and it has many attributes. For example:
 
 
 # Prompt for generate semantic embeddings and 2d
+
+I want to implement a Python script that read the tsv file and generate text embeddings and umap dimension reductions for visualization. Please follow these requirements:
+
+1. Read the input data `./nih-reporter-grants.tsv` or user given input path to a tsv file.
+2. For each grant in the tsv file, create a string using the following format:
+   "{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
+3. Use SentenceTransformer to embed the string to text embedding, use the model `google/embeddinggemma-300m` or any user provided model slug.
+4. Due the large size of dataset, please batch the embedding request to SentenceTransformer.
+5. Save all the embedding to `./nih-reporter-grants.embedding.npy` file, which is a NumPy file. User can also specify where to save.
+6. Once the high dimensional embedding is ready, user can reduce the embedding to 2d using umap (python umap-learn package). 
+7. The 2d embedding can be saved into a `./nih-reporter-grants.embd.npy` file. User can also specify where to save.
+8. Once the 2d embedding file is ready, user can merge the tsv file with the 2d embedding to a new file, e.g., `./grants.tsv`, or user specified file name.
+9. In the merged tsv file, only need the following columns:
+    - pid: core_project_num from the input tsv
+    - date: project_start_date. if project_start_date is not available, use fiscal_year but convert to <fiscal_year>-01-01 for same format.
+    - journal: agency_ic_admin
+    - title: project_title from the input tsv
+    - mesh_terms: pref_terms and spending_categories_desc from the input tsv. and add org_name at last. using ; to concat them.
+    - x: the first dimension from 2d embedding
+    - y: the second dimension from 2d embedding
+    - size: sqrt(award_amount) / 100
+    - citation_count: award_amount
+    - color: based on the first item in the spending_categories_desc (split by ; and trim), use a color dictionary to generate color. In total I want about 20 colors (e.g, tab20 schema in matplotlib)
+10. Each step, e.g., generate text embedding, dimension reduction, and merge, can run seperately. So we don't need to re-run embedding or dimension reduction again.
+11. For each step, please show a progress bar, especiall generate text embedding and merge. for umap, turn on verbose.
