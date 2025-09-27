@@ -16,7 +16,11 @@ from tqdm import tqdm
 
 
 class NIHProjectsDownloader:
-    def __init__(self, cache_dir: str = "./cache"):
+    def __init__(self, 
+        cache_dir: str = "./cache",
+        year_start: int = 1985,
+        year_end: int = 2025,
+    ):
         self.api_url = "https://api.reporter.nih.gov/v2/projects/search"
         self.cache_dir = Path(cache_dir)
         self.batch_size = 500
@@ -33,7 +37,7 @@ class NIHProjectsDownloader:
         ]
 
         # Fiscal years range (NIH RePORTER typically has data from 1985 onwards)
-        self.fiscal_years = list(range(1985, 2025))  # Adjust end year as needed
+        self.fiscal_years = list(range(year_start, year_end + 1))  # Adjust end year as needed
 
     def ensure_cache_dir(self, fiscal_year: int, org_state: str) -> Path:
         """Ensure cache directory exists for given fiscal year and org state."""
@@ -197,7 +201,7 @@ class NIHProjectsDownloader:
         total_combinations = 0
         completed_combinations = 0
 
-        for fiscal_year in self.fiscal_years:
+        for fiscal_year in tqdm(self.fiscal_years, desc="Processing fiscal years"):
             for org_state in self.states:
                 total_combinations += 1
 
@@ -207,28 +211,48 @@ class NIHProjectsDownloader:
                     total_count = self.get_total_count(fiscal_year, org_state)
                     total_projects += total_count
 
-        print(f"Download Statistics:")
-        print(f"Total combinations: {total_combinations}")
-        print(f"Completed combinations: {completed_combinations}")
-        print(f"Total projects found: {total_projects:,}")
-        print(f"Progress: {completed_combinations/total_combinations*100:.1f}%")
+        print(f"🔍 Download Statistics:")
+        print(f"- Total combinations: {total_combinations}")
+        print(f"- Completed combinations: {completed_combinations}")
+        print(f"- Total projects found: {total_projects:,}")
+        print(f"- Progress: {completed_combinations/total_combinations*100:.1f}%")
 
 
 if __name__ == "__main__":
-    downloader = NIHProjectsDownloader()
+    import argparse
+    parser = argparse.ArgumentParser(
+        description="Download NIH RePORTER projects",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    # action: stats, download
+    parser.add_argument("action", type=str, default="stat", choices=["stat", "download"])
+    parser.add_argument("--cache_dir", type=str, default="./cache")
+    parser.add_argument("--year_start", type=int, default=1985)
+    parser.add_argument("--year_end", type=int, default=2025)
+    args = parser.parse_args()
+    
+    downloader = NIHProjectsDownloader(
+        cache_dir=args.cache_dir,
+        year_start=args.year_start,
+        year_end=args.year_end,
+    )
 
     # Show current statistics if any data exists
     try:
-        downloader.get_download_statistics()
-        print("-" * 50)
-    except:
-        pass
-
-    # Start download
-    try:
-        downloader.download_all_projects()
+        if args.action == "stat":
+            downloader.get_download_statistics()
+            
+        elif args.action == "download":
+            # Start download
+            downloader.download_all_projects()
+            
+        else:
+            print(f"Invalid action: {args.action}")
+            parser.print_help()
+            
     except KeyboardInterrupt:
         print("\n⚠️  Download interrupted by user")
+        
     except Exception as e:
         print(f"❌ Fatal error: {e}")
         raise
