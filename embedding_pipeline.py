@@ -242,7 +242,7 @@ class GrantsEmbeddingPipeline:
                 size = 1
 
             # Citation count (same as award amount)
-            citation_count = award_amount
+            citation_count = award_amount / 1000 if award_amount > 0 else 0
 
             # Color based on spending category
             color = self.get_spending_category_color(spending_categories_desc)
