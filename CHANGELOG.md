@@ -123,7 +123,7 @@ Run:
 
 ```bash
 python embedding_pipeline.py all \
-  --batch_size 64 \
+  --batch_size 96 \
   --embedding_output nih-reporter-grants.embedding.v10.npy \
   --embd_output=nih-reporter-grants.embd.v10.npy \
   --final_outpu grants.v10.tsv
