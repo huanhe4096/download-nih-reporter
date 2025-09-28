@@ -25,7 +25,8 @@ class GrantsEmbeddingPipeline:
         embedding_output: str = "./nih-reporter-grants.embedding.npy",
         umap_output: str = "./nih-reporter-grants.embd.npy",
         final_output: str = "./grants.tsv",
-        batch_size: int = 32
+        batch_size: int = 32,
+        reduce_method: str = "opentsne",
     ):
         self.input_tsv = Path(input_tsv)
         self.embedding_model = embedding_model
@@ -33,6 +34,7 @@ class GrantsEmbeddingPipeline:
         self.umap_output = Path(umap_output)
         self.final_output = Path(final_output)
         self.batch_size = batch_size
+        self.reduce_method = reduce_method.lower()
 
         # Color mapping for spending categories (20 colors from tab20)
         self.colors = plt.cm.tab20(np.linspace(0, 1, 20))
@@ -48,9 +50,16 @@ class GrantsEmbeddingPipeline:
         abstract_text = str(row.get('abstract_text', ''))
         spending_categories_desc = str(row.get('spending_categories_desc', ''))
 
-        return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
+        # overall, adding abstract_text maybe not good for embedding
+        # return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
+
+        # category + title is better than abstract + title
         # return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {spending_categories_desc} | {project_title}"
+
+        # bge may not work well with long text
         # return f"{project_title} | {agency_ic_admin} | {activity_code} | {fiscal_year}" # this not well for embedding in baai/bge-small-v1.5
+
+        return f"{fiscal_year} | {agency_ic_admin} | {project_title}"
 
     def generate_embeddings(self):
         """Generate text embeddings for all grants."""
@@ -104,13 +113,17 @@ class GrantsEmbeddingPipeline:
         np.save(self.embedding_output, embeddings)
         print(f"✅ Embeddings saved successfully!")
 
-    def reduce_dimensions(self):
-        """Reduce embeddings to 2D using UMAP."""
-        print("📉 Reducing dimensions with UMAP...")
+    def reduce_dimensions(self, method: Optional[str] = None):
+        """Reduce embeddings to 2D using the selected method (openTSNE or UMAP)."""
+        method = (method or self.reduce_method or "opentsne").lower()
+        if method not in {"opentsne", "umap"}:
+            raise ValueError(f"Unknown reduction method: {method}. Choose 'opentsne' or 'umap'.")
 
-        # Check if UMAP output already exists
+        print(f"📉 Reducing dimensions with {method.upper()}...")
+
+        # Check if 2D output already exists
         if self.umap_output.exists():
-            print(f"⚠️  UMAP file already exists: {self.umap_output}")
+            print(f"⚠️  2D embeddings file already exists: {self.umap_output}")
             response = input("Do you want to overwrite it? (y/N): ")
             if response.lower() != 'y':
                 print("Skipping dimension reduction.")
@@ -120,27 +133,41 @@ class GrantsEmbeddingPipeline:
         if not self.embedding_output.exists():
             raise FileNotFoundError(f"Embeddings file not found: {self.embedding_output}")
 
-        # Import UMAP (lazy import)
-        try:
-            import umap
-        except ImportError:
-            raise ImportError("Please install umap-learn: pip install umap-learn")
+        # Lazy import for the chosen method
+        if method == "umap":
+            try:
+                import umap  # type: ignore
+            except ImportError:
+                raise ImportError("Please install umap-learn: pip install umap-learn")
+        else:  # opentsne
+            try:
+                from openTSNE import TSNE  # type: ignore
+            except ImportError:
+                raise ImportError("Please install openTSNE: pip install openTSNE")
 
         # Load embeddings
         print(f"📥 Loading embeddings from: {self.embedding_output}")
         embeddings = np.load(self.embedding_output)
         print(f"📊 Embeddings shape: {embeddings.shape}")
 
-        # Initialize UMAP
-        print("🔧 Initializing UMAP...")
-        reducer = umap.UMAP(
-            n_components=2,
-            verbose=True  # Show UMAP progress
-        )
-
-        # Fit and transform
-        print("🔄 Performing dimension reduction...")
-        embeddings_2d = reducer.fit_transform(embeddings)
+        # Initialize and run the selected reducer
+        print("🔧 Initializing reducer...")
+        if method == "umap":
+            reducer = umap.UMAP(
+                n_components=2,
+                verbose=True  # Show UMAP progress
+            )
+            print("🔄 Performing dimension reduction (UMAP)...")
+            embeddings_2d = reducer.fit_transform(embeddings)
+        else:
+            # openTSNE
+            tsne = TSNE(
+                n_components=2,
+                n_jobs=-1,
+                verbose=True,
+            )
+            print("🔄 Performing dimension reduction (openTSNE)...")
+            embeddings_2d = tsne.fit(embeddings)
         print(f"✅ 2D embeddings shape: {embeddings_2d.shape}")
 
         # Save 2D embeddings
@@ -221,8 +248,8 @@ class GrantsEmbeddingPipeline:
             org_name = str(row.get('org_name', ''))
 
             mesh_parts = []
-            # if pref_terms and pref_terms != 'nan':
-                # mesh_parts.append(pref_terms)
+            if pref_terms and pref_terms != 'nan':
+                mesh_parts.append(pref_terms)
             if spending_categories_desc and spending_categories_desc != 'nan':
                 mesh_parts.append(spending_categories_desc)
             if org_name and org_name != 'nan':
@@ -287,7 +314,7 @@ if __name__ == "__main__":
 
     # Main action
     parser.add_argument("action", choices=["embed", "reduce", "merge", "all"],
-                       help="Action to perform: embed (generate embeddings), reduce (UMAP), merge (create final TSV), or all")
+                       help="Action to perform: embed (generate embeddings), reduce (openTSNE/UMAP), merge (create final TSV), or all")
 
     # File paths
     parser.add_argument("--input", type=str, default="./nih-reporter-grants.tsv",
@@ -304,6 +331,8 @@ if __name__ == "__main__":
                        help="SentenceTransformer model to use")
     parser.add_argument("--batch_size", type=int, default=32,
                        help="Batch size for embedding generation")
+    parser.add_argument("--reduce_method", type=str, choices=["opentsne", "umap"], default="opentsne",
+                       help="Dimension reduction method to use")
 
     args = parser.parse_args()
 
@@ -313,7 +342,8 @@ if __name__ == "__main__":
         embedding_output=args.embedding_output,
         umap_output=args.umap_output,
         final_output=args.final_output,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        reduce_method=args.reduce_method,
     )
 
     print(f"🚀 NIH Grants Embedding Pipeline")

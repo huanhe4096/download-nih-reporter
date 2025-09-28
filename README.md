@@ -22,3 +22,18 @@ Running `python download_nih_project.py stat` will show something similar to thi
 - Total projects found: 2,719,706
 - Progress: 100.0%
 ```
+
+## Embedding and Dimensionality Reduction
+
+Generate embeddings and reduce dimensions to 2D:
+
+```bash
+python embedding_pipeline.py all --reduce_method opentsne \
+  --input ./nih-reporter-grants.tsv \
+  --embedding_output ./nih-reporter-grants.embedding.npy \
+  --umap_output ./nih-reporter-grants.embd.npy \
+  --final_output ./grants.tsv
+```
+
+- `--reduce_method` can be `opentsne` (default) or `umap`.
+- Install extras if needed: `pip install openTSNE umap-learn`.
