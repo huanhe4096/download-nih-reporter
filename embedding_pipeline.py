@@ -165,6 +165,11 @@ class GrantsEmbeddingPipeline:
             )
             print("🔄 Performing dimension reduction (UMAP)...")
             embeddings_2d = reducer.fit_transform(embeddings)
+
+            # the range of UMAP results is around -20 to 20
+            # we want to scale it to around -110 to 110
+            embeddings_2d = embeddings_2d * 5.5
+            
         else:
             # openTSNE
             tsne = TSNE(
