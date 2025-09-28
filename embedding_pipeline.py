@@ -221,8 +221,8 @@ class GrantsEmbeddingPipeline:
             org_name = str(row.get('org_name', ''))
 
             mesh_parts = []
-            if pref_terms and pref_terms != 'nan':
-                mesh_parts.append(pref_terms)
+            # if pref_terms and pref_terms != 'nan':
+                # mesh_parts.append(pref_terms)
             if spending_categories_desc and spending_categories_desc != 'nan':
                 mesh_parts.append(spending_categories_desc)
             if org_name and org_name != 'nan':
