@@ -48,9 +48,9 @@ class GrantsEmbeddingPipeline:
         abstract_text = str(row.get('abstract_text', ''))
         spending_categories_desc = str(row.get('spending_categories_desc', ''))
 
-        # return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
+        return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
         # return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {spending_categories_desc} | {project_title}"
-        return f"{project_title} | {agency_ic_admin} | {activity_code} | {fiscal_year}"
+        # return f"{project_title} | {agency_ic_admin} | {activity_code} | {fiscal_year}" # this not well for embedding in baai/bge-small-v1.5
 
     def generate_embeddings(self):
         """Generate text embeddings for all grants."""
