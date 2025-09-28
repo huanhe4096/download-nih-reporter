@@ -89,3 +89,22 @@ python embedding_pipeline.py all \
   --embd_output=nih-reporter-grants.embd.v8.npy \
   --final_outpu grants.v8.tsv
 ```
+
+
+# v9 test
+
+Just title + agency.
+
+```python
+return f"{project_title} | {agency_ic_admin}"
+```
+
+Run:
+
+```bash
+python embedding_pipeline.py all \
+  --batch_size 64 \
+  --embedding_output nih-reporter-grants.embedding.v9.npy \
+  --embd_output=nih-reporter-grants.embd.v9.npy \
+  --final_outpu grants.v9.tsv
+```
