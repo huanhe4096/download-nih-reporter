@@ -68,3 +68,24 @@ python embedding_pipeline.py all \
   --embd_output=nih-reporter-grants.embd.v7.npy \
   --final_outpu grants.v7.tsv
 ```
+
+
+# v8 test
+
+Just title?
+
+Remove funding agency, just keep title and fiscal year.
+
+```python
+return project_title
+```
+
+Run:
+
+```bash
+python embedding_pipeline.py all \
+  --batch_size 64 \
+  --embedding_output nih-reporter-grants.embedding.v8.npy \
+  --embd_output=nih-reporter-grants.embd.v8.npy \
+  --final_outpu grants.v8.tsv
+```

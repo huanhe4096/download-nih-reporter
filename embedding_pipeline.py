@@ -64,7 +64,9 @@ class GrantsEmbeddingPipeline:
 
         # return f"{fiscal_year} | {agency_ic_admin} | {project_title}"
         # return f"{agency_ic_admin} | {project_title} | {fiscal_year}"
-        return f"{project_title} | {fiscal_year}"
+        # return f"{project_title} | {fiscal_year}"
+
+        return project_title
     
 
     def generate_embeddings(self):
@@ -169,7 +171,7 @@ class GrantsEmbeddingPipeline:
             # the range of UMAP results is around -20 to 20
             # we want to scale it to around -110 to 110
             embeddings_2d = embeddings_2d * 5.5
-            
+
         else:
             # openTSNE
             tsne = TSNE(
