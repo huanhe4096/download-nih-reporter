@@ -23,7 +23,7 @@ class GrantsEmbeddingPipeline:
         input_tsv: str = "./nih-reporter-grants.tsv",
         embedding_model: str = "google/embeddinggemma-300m",
         embedding_output: str = "./nih-reporter-grants.embedding.npy",
-        umap_output: str = "./nih-reporter-grants.embd.npy",
+        embd_output: str = "./nih-reporter-grants.embd.npy",
         final_output: str = "./grants.tsv",
         batch_size: int = 32,
         reduce_method: str = "opentsne",
@@ -31,7 +31,7 @@ class GrantsEmbeddingPipeline:
         self.input_tsv = Path(input_tsv)
         self.embedding_model = embedding_model
         self.embedding_output = Path(embedding_output)
-        self.umap_output = Path(umap_output)
+        self.embd_output = Path(embd_output)
         self.final_output = Path(final_output)
         self.batch_size = batch_size
         self.reduce_method = reduce_method.lower()
@@ -123,8 +123,8 @@ class GrantsEmbeddingPipeline:
         print(f"📉 Reducing dimensions with {method.upper()}...")
 
         # Check if 2D output already exists
-        if self.umap_output.exists():
-            print(f"⚠️  2D embeddings file already exists: {self.umap_output}")
+        if self.embd_output.exists():
+            print(f"⚠️  2D embeddings file already exists: {self.embd_output}")
             response = input("Do you want to overwrite it? (y/N): ")
             if response.lower() != 'y':
                 print("Skipping dimension reduction.")
@@ -172,8 +172,8 @@ class GrantsEmbeddingPipeline:
         print(f"✅ 2D embeddings shape: {embeddings_2d.shape}")
 
         # Save 2D embeddings
-        print(f"💾 Saving 2D embeddings to: {self.umap_output}")
-        np.save(self.umap_output, embeddings_2d)
+        print(f"💾 Saving 2D embeddings to: {self.embd_output}")
+        np.save(self.embd_output, embeddings_2d)
         print(f"✅ 2D embeddings saved successfully!")
 
     def get_spending_category_color(self, spending_categories_desc: str) -> str:
@@ -208,16 +208,16 @@ class GrantsEmbeddingPipeline:
         # Check if required files exist
         if not self.input_tsv.exists():
             raise FileNotFoundError(f"Input TSV file not found: {self.input_tsv}")
-        if not self.umap_output.exists():
-            raise FileNotFoundError(f"2D embeddings file not found: {self.umap_output}")
+        if not self.embd_output.exists():
+            raise FileNotFoundError(f"2D embeddings file not found: {self.embd_output}")
 
         # Load data
         print(f"📥 Loading TSV data from: {self.input_tsv}")
         df = pd.read_csv(self.input_tsv, sep='\t')
         print(f"📊 TSV data shape: {df.shape}")
 
-        print(f"📥 Loading 2D embeddings from: {self.umap_output}")
-        embeddings_2d = np.load(self.umap_output)
+        print(f"📥 Loading 2D embeddings from: {self.embd_output}")
+        embeddings_2d = np.load(self.embd_output)
         print(f"📊 2D embeddings shape: {embeddings_2d.shape}")
 
         # Verify dimensions match
@@ -322,7 +322,7 @@ if __name__ == "__main__":
                        help="Input TSV file path")
     parser.add_argument("--embedding_output", type=str, default="./nih-reporter-grants.embedding.npy",
                        help="Output path for embeddings")
-    parser.add_argument("--umap_output", type=str, default="./nih-reporter-grants.embd.npy",
+    parser.add_argument("--embd_output", type=str, default="./nih-reporter-grants.embd.npy",
                        help="Output path for 2D embeddings")
     parser.add_argument("--final_output", type=str, default="./grants.tsv",
                        help="Final merged TSV output")
@@ -341,7 +341,7 @@ if __name__ == "__main__":
         input_tsv=args.input,
         embedding_model=args.model,
         embedding_output=args.embedding_output,
-        umap_output=args.umap_output,
+        embd_output=args.embd_output,
         final_output=args.final_output,
         batch_size=args.batch_size,
         reduce_method=args.reduce_method,
