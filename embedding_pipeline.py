@@ -66,7 +66,8 @@ class GrantsEmbeddingPipeline:
         # return f"{agency_ic_admin} | {project_title} | {fiscal_year}"
         # return f"{project_title} | {fiscal_year}"
 
-        return f"{project_title} | {agency_ic_admin}"
+        # return f"{project_title} | {agency_ic_admin}"
+        return f"{agency_ic_admin} | {project_title}"
     
 
     def generate_embeddings(self):
