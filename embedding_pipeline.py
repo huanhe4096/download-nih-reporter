@@ -47,6 +47,9 @@ class GrantsEmbeddingPipeline:
         agency_ic_admin = str(row.get('agency_ic_admin', ''))
         activity_code = str(row.get('activity_code', ''))
         project_title = str(row.get('project_title', ''))
+        # convert project_title to camel case
+        project_title = ' '.join([word.capitalize() for word in project_title.split()])
+        
         abstract_text = str(row.get('abstract_text', ''))
         spending_categories_desc = str(row.get('spending_categories_desc', ''))
 
