@@ -39,7 +39,7 @@ class GrantsEmbeddingPipeline:
         # Color mapping for spending categories (20 colors from tab20)
         self.colors = plt.cm.tab20(np.linspace(0, 1, 20))
         self.color_hex = ['#{:02x}{:02x}{:02x}'.format(int(r*255), int(g*255), int(b*255))
-                         for r, g, b, _ in self.colors]
+                        for r, g, b, _ in self.colors]
 
     def create_text_representation(self, row: Dict) -> str:
         """Create text representation for embedding."""
@@ -49,7 +49,7 @@ class GrantsEmbeddingPipeline:
         project_title = str(row.get('project_title', ''))
         # convert project_title to camel case
         project_title = ' '.join([word.capitalize() for word in project_title.split()])
-        
+
         abstract_text = str(row.get('abstract_text', ''))
         spending_categories_desc = str(row.get('spending_categories_desc', ''))
 
@@ -63,7 +63,9 @@ class GrantsEmbeddingPipeline:
         # return f"{project_title} | {agency_ic_admin} | {activity_code} | {fiscal_year}" # this not well for embedding in baai/bge-small-v1.5
 
         # return f"{fiscal_year} | {agency_ic_admin} | {project_title}"
-        return f"{agency_ic_admin} | {project_title} | {fiscal_year}"
+        # return f"{agency_ic_admin} | {project_title} | {fiscal_year}"
+        return f"{project_title} | {fiscal_year}"
+    
 
     def generate_embeddings(self):
         """Generate text embeddings for all grants."""
@@ -273,7 +275,7 @@ class GrantsEmbeddingPipeline:
                 size = 1
 
             # Citation count (same as award amount)
-            citation_count = award_amount / 1000 if award_amount > 0 else 0
+            citation_count = award_amount if award_amount > 0 else 0
 
             # Color based on spending category
             color = self.get_spending_category_color(spending_categories_desc)
