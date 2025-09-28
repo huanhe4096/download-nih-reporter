@@ -59,7 +59,8 @@ class GrantsEmbeddingPipeline:
         # bge may not work well with long text
         # return f"{project_title} | {agency_ic_admin} | {activity_code} | {fiscal_year}" # this not well for embedding in baai/bge-small-v1.5
 
-        return f"{fiscal_year} | {agency_ic_admin} | {project_title}"
+        # return f"{fiscal_year} | {agency_ic_admin} | {project_title}"
+        # return f"{agency_ic_admin} | {project_title} | {fiscal_year}"
 
     def generate_embeddings(self):
         """Generate text embeddings for all grants."""
