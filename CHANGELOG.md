@@ -72,9 +72,7 @@ python embedding_pipeline.py all \
 
 # v8 test
 
-Just title?
-
-Remove funding agency, just keep title and fiscal year.
+Just title.
 
 ```python
 return project_title
@@ -108,12 +106,13 @@ python embedding_pipeline.py all \
   --embd_output=nih-reporter-grants.embd.v9.npy \
   --final_outpu grants.v9.tsv
 ```
-```
 
 
 # v10 test
 
 Reverse the order of title and agency.
+
+Basically, not much difference.
 
 ```python
 return f"{agency_ic_admin} | {project_title}"
@@ -128,3 +127,23 @@ python embedding_pipeline.py all \
   --embd_output=nih-reporter-grants.embd.v10.npy \
   --final_outpu grants.v10.tsv
 ```
+
+
+# v11 test
+
+I want to use a more natural way to describe 
+
+```python
+return f"{project_title}. Project starts on {project_start_date}, ends on {project_end_date}. {agency_ic_admin}."
+```
+
+Run:
+
+```bash
+python embedding_pipeline.py all \
+  --batch_size 96 \
+  --embedding_output nih-reporter-grants.embedding.v11.npy \
+  --embd_output=nih-reporter-grants.embd.v11.npy \
+  --final_outpu grants.v11.tsv
+```
+

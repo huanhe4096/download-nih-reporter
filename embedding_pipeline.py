@@ -53,6 +53,9 @@ class GrantsEmbeddingPipeline:
         abstract_text = str(row.get('abstract_text', ''))
         spending_categories_desc = str(row.get('spending_categories_desc', ''))
 
+        project_start_date = str(row.get('project_start_date', ''))
+        project_end_date = str(row.get('project_end_date', ''))
+
         # overall, adding abstract_text maybe not good for embedding
         # return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
 
@@ -67,7 +70,8 @@ class GrantsEmbeddingPipeline:
         # return f"{project_title} | {fiscal_year}"
 
         # return f"{project_title} | {agency_ic_admin}"
-        return f"{agency_ic_admin} | {project_title}"
+        # return f"{agency_ic_admin} | {project_title}"
+        return f"{project_title}. Project starts on {project_start_date}, ends on {project_end_date}. {agency_ic_admin}."
     
 
     def generate_embeddings(self):
@@ -283,7 +287,7 @@ class GrantsEmbeddingPipeline:
                 size = 1
 
             # Citation count (same as award amount)
-            citation_count = award_amount if award_amount > 0 else 0
+            citation_count = int(award_amount) if award_amount > 0 else 0
 
             # Color based on spending category
             color = self.get_spending_category_color(spending_categories_desc)
