@@ -176,6 +176,8 @@ python embedding_pipeline.py all \
 
 I want to try same v12 text, but using BAAI/bge-small-en-v1.5
 
+Overall, I think BAAI/bge is not as good as gemma. Later may try Qwen, but for now gemma is good enough.
+
 ```python
 return f"{project_title} | {pref_terms} {spending_categories_desc}"
 ```
