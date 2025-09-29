@@ -186,7 +186,7 @@ Run:
 python embedding_pipeline.py all \
   --batch_size 32 \
   --model BAAI/bge-small-en-v1.5\
-  --embedding_output nih-reporter-grants.embedding.v12.npy \
-  --embd_output=nih-reporter-grants.embd.v12.npy \
-  --final_outpu grants.v12.tsv
+  --embedding_output nih-reporter-grants.embedding.v13.npy \
+  --embd_output=nih-reporter-grants.embd.v13.npy \
+  --final_outpu grants.v13.tsv
 ```
