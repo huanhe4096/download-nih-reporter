@@ -56,6 +56,8 @@ class GrantsEmbeddingPipeline:
         project_start_date = str(row.get('project_start_date', ''))
         project_end_date = str(row.get('project_end_date', ''))
 
+        pref_terms = str(row.get('pref_terms', ''))
+
         # overall, adding abstract_text maybe not good for embedding
         # return f"{fiscal_year} | {agency_ic_admin} | {activity_code} | {project_title} | {abstract_text}"
 
@@ -71,7 +73,9 @@ class GrantsEmbeddingPipeline:
 
         # return f"{project_title} | {agency_ic_admin}"
         # return f"{agency_ic_admin} | {project_title}"
-        return f"{project_title}. Project starts on {project_start_date}, ends on {project_end_date}. {agency_ic_admin}."
+        # return f"{project_title}. Project starts on {project_start_date}, ends on {project_end_date}. {agency_ic_admin}."
+
+        return f"{project_title} | {pref_terms} {spending_categories_desc}"
     
 
     def generate_embeddings(self):

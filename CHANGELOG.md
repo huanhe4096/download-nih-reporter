@@ -147,3 +147,22 @@ python embedding_pipeline.py all \
   --final_outpu grants.v11.tsv
 ```
 
+
+
+# v12 test
+
+I want to try text only, but not too long
+
+```python
+return f"{project_title} | {pref_terms} {spending_categories_desc}"
+```
+
+Run:
+
+```bash
+python embedding_pipeline.py all \
+  --batch_size 32 \
+  --embedding_output nih-reporter-grants.embedding.v12.npy \
+  --embd_output=nih-reporter-grants.embd.v12.npy \
+  --final_outpu grants.v12.tsv
+```
