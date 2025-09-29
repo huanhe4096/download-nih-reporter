@@ -151,7 +151,9 @@ python embedding_pipeline.py all \
 
 # v12 test
 
-I want to try text only, but not too long
+I want to try text only, but not too long.
+
+The result is interesting, projects are well splited with year. Why?
 
 ```python
 return f"{project_title} | {pref_terms} {spending_categories_desc}"
@@ -162,6 +164,28 @@ Run:
 ```bash
 python embedding_pipeline.py all \
   --batch_size 32 \
+  --embedding_output nih-reporter-grants.embedding.v12.npy \
+  --embd_output=nih-reporter-grants.embd.v12.npy \
+  --final_outpu grants.v12.tsv
+```
+
+
+
+
+# v13 test
+
+I want to try same v12 text, but using BAAI/bge-small-en-v1.5
+
+```python
+return f"{project_title} | {pref_terms} {spending_categories_desc}"
+```
+
+Run:
+
+```bash
+python embedding_pipeline.py all \
+  --batch_size 32 \
+  --model BAAI/bge-small-en-v1.5\
   --embedding_output nih-reporter-grants.embedding.v12.npy \
   --embd_output=nih-reporter-grants.embd.v12.npy \
   --final_outpu grants.v12.tsv
