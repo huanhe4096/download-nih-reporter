@@ -373,7 +373,7 @@ First, for the `gpa.points.tsv`, follow these requirements:
     - y: the second dimension from 2d embedding
     - citation_count: for grant, use award_amount; for papers, find the `citation_count` in another sqlite database `~/data/icite/latest/icite.db`'s `papers` table by `pmid` column; for authors, leave this as 1.
     - size: for grant, use the sqrt(award_amount) / 100; for paper, find the `relative_citation_ratio` in the icite.db as well; for authors, just leave as 5.
-    - color: for grant, use gold; for paper, use #ff0000; for authors, use lightblue.
+    - color: for grant, use #ffe100; for paper, use #f84848; for authors, use #1196fc.
 - Read the input grant list `grant-list.tsv`, or user given input path to a tsv file.
 - For each grant in the tsv file, create a string using the following format:
    "{fiscal_year} | {agency_ic_admin} | {project_title}"
@@ -391,8 +391,8 @@ First, for the `gpa.points.tsv`, follow these requirements:
 - Use SentenceTransformer to embed the string to text embedding, use the model `google/embeddinggemma-300m` or any user provided model slug.
 - Due the large size of dataset, please batch the embedding request to SentenceTransformer.
 - Save all the embedding to `./gpa.embedding.npy` file, which is a NumPy file. User can also specify where to save.
-- Once the high dimensional embedding is ready, user can reduce the embedding to 2d using umap (python umap-learn package). 
-- The 2d embedding can be saved into a `./nih-reporter-grants.embd.npy` file. User can also specify where to save.
+- Once the high dimensional embedding is ready, user can reduce the embedding to 2d using tsne (python opentsne package). 
+- The 2d embedding can be saved into a `./gpa.embd.npy` file. User can also specify where to save.
 - Once the 2d embedding file is ready, user can merge the tsv file with the 2d embedding 
 -  Each step, e.g., generate text embedding, dimension reduction, and merge, can run seperately. So we don't need to re-run embedding or dimension reduction again.
 - For each step, please show a progress bar, especiall generate text embedding and merge. for umap, turn on verbose.
