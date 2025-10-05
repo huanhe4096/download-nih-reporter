@@ -165,3 +165,7 @@ cache/
 *.tsv
 *.npy
 *.tar.gz
+*.db
+*.db-journal
+
+*.json
