@@ -194,9 +194,10 @@ class GrantsEmbeddingPipeline:
                 n_components=2,
                 n_jobs=-1,
                 verbose=True,
-                perplexity=100,
+                perplexity=10,
                 initialization="pca",
                 metric="euclidean",
+                exaggeration=20,
             )
             print("🔄 Performing dimension reduction (openTSNE)...")
             embeddings_2d = tsne.fit(embeddings)
