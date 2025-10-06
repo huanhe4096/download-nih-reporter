@@ -22,8 +22,8 @@ class NIHDataConverter:
         self.output_file = Path(output_file)
         self.seen_project_nums: Set[str] = set()
         self.seen_core_project_nums: Set[str] = set()
-        self.skipped_project_nums = 0
-        self.skipped_core_project_nums = 0
+        self.skipped_project_nums = []
+        self.skipped_core_project_nums = []
 
         # TSV column headers
         self.headers = [
@@ -110,13 +110,13 @@ class NIHDataConverter:
 
             # Check for duplicate project_num
             if project_num in self.seen_project_nums:
-                self.skipped_project_nums += 1
+                self.skipped_project_nums.append(project_num)
                 return None
 
             # Check for duplicate core_project_num (use project_num if core is empty)
             check_core = core_project_num if core_project_num else project_num
             if check_core in self.seen_core_project_nums:
-                self.skipped_core_project_nums += 1
+                self.skipped_core_project_nums.append([project_num, core_project_num])
                 return None
 
             # Add to seen sets
@@ -248,11 +248,23 @@ class NIHDataConverter:
         print(f"📊 Statistics:")
         print(f"   - Total projects processed: {processed_count:,}")
         print(f"   - Projects written to TSV: {written_count:,}")
-        print(f"   - Duplicates skipped (project_num): {self.skipped_project_nums:,}")
-        print(f"   - Duplicates skipped (core_project_num): {self.skipped_core_project_nums:,}")
-        print(f"   - Total duplicates skipped: {self.skipped_project_nums + self.skipped_core_project_nums:,}")
+        print(f"   - Duplicates skipped (project_num): {len(self.skipped_project_nums):,}")
+        print(f"   - Duplicates skipped (core_project_num): {len(self.skipped_core_project_nums):,}")
+        print(f"   - Total duplicates skipped: {len(self.skipped_project_nums) + len(self.skipped_core_project_nums):,}")
         print(f"   - Output file: {self.output_file}")
         print(f"   - File size: {self.output_file.stat().st_size / (1024*1024):.1f} MB")
+        
+        # save skipped project numbers to file
+        with open('skipped_project_nums.txt', 'w') as f:
+            for project_num in self.skipped_project_nums:
+                f.write(f"{project_num}\n")
+        print(f"* saved skipped project numbers to file")
+        
+        # save skipped core project numbers to file
+        with open('skipped_core_project_nums.txt', 'w') as f:
+            for project_num, core_project_num in self.skipped_core_project_nums:
+                f.write(f"{project_num}\t{core_project_num}\n")
+        print(f"* saved skipped core project numbers to file")
 
 
 if __name__ == "__main__":

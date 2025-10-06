@@ -48,6 +48,7 @@ import json
 import sqlite3
 import time
 from pathlib import Path
+import dateparser
 from typing import Dict, List, Set, Tuple, Optional
 import numpy as np
 import requests
@@ -506,14 +507,19 @@ class OutputGenerator:
         self.icite_db = icite_db
 
     def parse_date(self, date_str: str, fiscal_year: int = None) -> str:
-        """Parse date string to YYYY-MM-DD format"""
+        """Parse date string to YYYY-MM-DD format using dateparser for robust parsing"""
         if not date_str or pd.isna(date_str):
             if fiscal_year:
                 return f"{fiscal_year}-01-01"
             return "1900-01-01"
 
         try:
-            # Try parsing common date formats
+            # Use dateparser for robust date parsing (handles formats like "2021 Sep", etc.)
+            parsed_date = dateparser.parse(str(date_str))
+            if parsed_date:
+                return parsed_date.strftime('%Y-%m-%d')
+            
+            # If dateparser fails, try manual parsing as fallback
             for fmt in ['%Y-%m-%d', '%Y-%m', '%Y', '%m/%d/%Y', '%m-%d-%Y']:
                 try:
                     parsed_date = datetime.strptime(str(date_str), fmt)
@@ -524,12 +530,12 @@ class OutputGenerator:
             # If all parsing fails, use fiscal year
             if fiscal_year:
                 return f"{fiscal_year}-01-01"
-            return "1900-01-01"
+            return "2020-01-01"
 
         except Exception:
             if fiscal_year:
                 return f"{fiscal_year}-01-01"
-            return "1900-01-01"
+            return "2020-01-01"
 
     def generate_author_id(self, author_name: str) -> str:
         """Generate a hash ID for an author"""
@@ -565,7 +571,7 @@ class OutputGenerator:
                 fiscal_year = grant_data.get('fiscal_year', '')
                 agency = self._extract_agency_abbreviation(grant_data.get('agency_ic_admin', ''))
                 title = grant_data.get('project_title', '')
-                text = f"{fiscal_year} | {agency} | {title}"
+                text = f"{title}"
 
                 items.append({
                     'type': 'grant',
@@ -605,8 +611,9 @@ class OutputGenerator:
                     if isinstance(author, dict):
                         author_name = author.get('name', '')
                         if author_name and author_name not in processed_authors:
+                            source = paper_data.get('source', '')
                             title = paper_data.get('title', '')
-                            text = f"Author name: {author_name} published {title}"
+                            text = f"{source} | {author_name} | {title}"
 
                             items.append({
                                 'type': 'author',

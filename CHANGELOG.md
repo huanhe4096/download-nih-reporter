@@ -192,3 +192,15 @@ python embedding_pipeline.py all \
   --embd_output=nih-reporter-grants.embd.v13.npy \
   --final_outpu grants.v13.tsv
 ```
+
+
+# For NIA only
+
+```bash
+python embedding_pipeline.py all \
+  --input nih-nia-grants.tsv \
+  --batch_size 32 \
+  --embedding_output=nih-nia-grants.embedding.npy \
+  --embd_output=nih-nia-grants.embd.npy \
+  --final_output nih-nia-grants.tsv
+```

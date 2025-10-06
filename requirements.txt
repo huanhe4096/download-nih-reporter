@@ -6,3 +6,4 @@ matplotlib>=3.7.0
 sentence-transformers>=2.2.0
 umap-learn>=0.5.3
 opentsne
+dateparser

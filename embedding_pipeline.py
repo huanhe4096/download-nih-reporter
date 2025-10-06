@@ -77,6 +77,9 @@ class GrantsEmbeddingPipeline:
 
         return f"{project_title} | {pref_terms} {spending_categories_desc}"
     
+        # For NIA only
+        return f"{project_title} | {pref_terms} {spending_categories_desc}. Project starts on {project_start_date}, ends on {project_end_date}. {agency_ic_admin}."
+    
 
     def generate_embeddings(self):
         """Generate text embeddings for all grants."""
