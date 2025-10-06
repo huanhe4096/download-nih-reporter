@@ -215,7 +215,7 @@ v2, try title + abstract
 python embedding_pipeline.py all \
   --input=nih-nia-grants.tsv \
   --batch_size=32 \
-  --embedding_output=nih-nia-grants.embedding.npy \
-  --embd_output=nih-nia-grants.embd.npy \
+  --embedding_output=nih-nia-grants.embedding.v2.npy \
+  --embd_output=nih-nia-grants.embd.v2.npy \
   --final_output nia-25k.v2.tsv
 ```
