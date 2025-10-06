@@ -194,6 +194,9 @@ class GrantsEmbeddingPipeline:
                 n_components=2,
                 n_jobs=-1,
                 verbose=True,
+                perplexity=100,
+                initialization="pca",
+                metric="euclidean",
             )
             print("🔄 Performing dimension reduction (openTSNE)...")
             embeddings_2d = tsne.fit(embeddings)
@@ -382,16 +385,16 @@ if __name__ == "__main__":
     print("-" * 50)
 
     try:
-        if args.action == "embed":
+        if "embed" in args.action:
             pipeline.generate_embeddings()
 
-        elif args.action == "reduce":
+        if "reduce" in args.action:
             pipeline.reduce_dimensions()
 
-        elif args.action == "merge":
+        if "merge" in args.action:
             pipeline.merge_with_embeddings()
 
-        elif args.action == "all":
+        if args.action == "all":
             print("🔄 Running full pipeline...")
             pipeline.generate_embeddings()
             pipeline.reduce_dimensions()
