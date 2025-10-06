@@ -345,7 +345,7 @@ if __name__ == "__main__":
     )
 
     # Main action
-    parser.add_argument("action", choices=["embed", "reduce", "merge", "all"],
+    parser.add_argument("action", type=str,
                        help="Action to perform: embed (generate embeddings), reduce (openTSNE/UMAP), merge (create final TSV), or all")
 
     # File paths
