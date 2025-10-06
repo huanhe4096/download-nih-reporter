@@ -202,5 +202,5 @@ python embedding_pipeline.py all \
   --batch_size 32 \
   --embedding_output=nih-nia-grants.embedding.npy \
   --embd_output=nih-nia-grants.embd.npy \
-  --final_output nih-nia-grants.tsv
+  --final_output nia-25k.tsv
 ```
