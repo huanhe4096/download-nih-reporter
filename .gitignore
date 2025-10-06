@@ -170,3 +170,5 @@ cache/
 
 *.json
 *.txt
+
+*.swp

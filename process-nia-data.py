@@ -21,7 +21,7 @@ df_nia.head()
 
 
 #%% save all NIA grants
-df_nia.to_csv('nia-nia-grants.tsv', sep='\t', index=False)
+df_nia.to_csv('nih-nia-grants.tsv', sep='\t', index=False)
 print('* saved all NIA grants successfully')
 
 #%%
