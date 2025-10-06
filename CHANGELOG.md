@@ -196,11 +196,26 @@ python embedding_pipeline.py all \
 
 # For NIA only
 
+v1, title only. seems not good.
+
 ```bash
 python embedding_pipeline.py all \
-  --input nih-nia-grants.tsv \
-  --batch_size 32 \
+  --input=nih-nia-grants.tsv \
+  --batch_size=32 \
   --embedding_output=nih-nia-grants.embedding.npy \
   --embd_output=nih-nia-grants.embd.npy \
   --final_output nia-25k.tsv
+```
+
+
+
+v2, try title + abstract
+
+```bash
+python embedding_pipeline.py all \
+  --input=nih-nia-grants.tsv \
+  --batch_size=32 \
+  --embedding_output=nih-nia-grants.embedding.npy \
+  --embd_output=nih-nia-grants.embd.npy \
+  --final_output nia-25k.v2.tsv
 ```
