@@ -101,7 +101,7 @@ class NIHDataConverter:
         # Take first 10 characters (YYYY-MM-DD)
         return str(date_str)[:10]
 
-    def extract_project_data(self, project: Dict) -> Optional[Dict]:
+    def extract_project_data(self, project: Dict, skip_duplicates: bool = True) -> Optional[Dict]:
         """Extract required fields from a project record."""
         try:
             # Extract project number and core project number
@@ -111,13 +111,15 @@ class NIHDataConverter:
             # Check for duplicate project_num
             if project_num in self.seen_project_nums:
                 self.skipped_project_nums.append(project_num)
-                return None
+                if skip_duplicates:
+                    return None
 
             # Check for duplicate core_project_num (use project_num if core is empty)
             check_core = core_project_num if core_project_num else project_num
             if check_core in self.seen_core_project_nums:
                 self.skipped_core_project_nums.append([project_num, core_project_num])
-                return None
+                if skip_duplicates:
+                    return None
 
             # Add to seen sets
             self.seen_project_nums.add(project_num)
@@ -189,7 +191,7 @@ class NIHDataConverter:
             print(f"⚠️  Error extracting project data: {e}")
             return None
 
-    def convert_to_tsv(self):
+    def convert_to_tsv(self, skip_duplicates: bool = True):
         """Convert all cached JSON data to TSV format with streaming output."""
         print("🚀 Starting conversion to TSV...")
 
@@ -232,7 +234,7 @@ class NIHDataConverter:
                             pbar.update(1)
 
                             # Extract project data
-                            project_data = self.extract_project_data(project)
+                            project_data = self.extract_project_data(project, skip_duplicates)
 
                             if project_data:
                                 # Write to TSV
@@ -274,6 +276,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("--cache_dir", type=str, default="./cache",
                        help="Directory containing cached JSON files")
+    parser.add_argument("--skip_duplicates", action="store_true", default=True,
+                       help="Skip duplicates by project_num and core_project_num")
     parser.add_argument("--output", type=str, default="./nih-reporter-grants.tsv",
                        help="Output TSV file path")
 
@@ -286,7 +290,7 @@ if __name__ == "__main__":
     print("-" * 50)
 
     try:
-        converter.convert_to_tsv()
+        converter.convert_to_tsv(skip_duplicates=args.skip_duplicates)
     except KeyboardInterrupt:
         print("\n⚠️  Conversion interrupted by user")
     except Exception as e:
